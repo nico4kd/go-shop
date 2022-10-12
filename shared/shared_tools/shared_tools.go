@@ -1,6 +1,7 @@
 package shared
 
 import (
+	"database/sql"
 	"github.com/solrac97gr/go-shop/shared/config"
 	"github.com/solrac97gr/go-shop/shared/logger"
 	"github.com/solrac97gr/go-shop/shared/session"
@@ -12,4 +13,5 @@ type Tools struct {
 	Validator            validator.Validator
 	EnvironmentVariables config.Configurator
 	SessionManager       session.Session
+	DatabaseClient       *sql.DB
 }

@@ -3,6 +3,7 @@ package config
 type Configurator interface {
 	SetEnvironmentVariables() error
 	GetDatabaseConfig() DatabaseConfig
+	GetPort() string
 }
 
 type DatabaseConfig struct {
@@ -16,6 +17,7 @@ type DatabaseConfig struct {
 type CustomConfigurator struct {
 	Database    DatabaseConfig
 	Environment string
+	Port        string
 }
 
 func NewCustomConfigurator() *CustomConfigurator {
@@ -32,4 +34,8 @@ func (c *CustomConfigurator) GetDatabaseConfig() DatabaseConfig {
 func (c *CustomConfigurator) SetEnvironmentVariables() error {
 	//TODO implement me
 	panic("implement me")
+}
+
+func (c *CustomConfigurator) GetPort() string {
+	return c.Port
 }

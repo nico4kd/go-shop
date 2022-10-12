@@ -11,7 +11,7 @@ type ProductHandler struct {
 
 var _ ports.ProductHandler = &ProductHandler{}
 
-func NewProductHandler(productApplication ports.ProductApplication) *ProductHandler {
+func NewProductHandlers(productApplication ports.ProductApplication) *ProductHandler {
 	return &ProductHandler{
 		ProductApplication: productApplication,
 	}

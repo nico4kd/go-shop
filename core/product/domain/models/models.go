@@ -1,5 +1,7 @@
 package models
 
+import "time"
+
 type Product struct {
 	ID          int64
 	Name        string
@@ -8,6 +10,10 @@ type Product struct {
 	Photos      []string
 	CreatorID   string
 	Stock       int64
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	DeletedAt   time.Time
+	IsDeleted   bool
 }
 
 func (p *Product) Validate() error {
