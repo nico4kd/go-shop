@@ -2,6 +2,7 @@ package factories
 
 import (
 	"database/sql"
+	"fmt"
 	orderApp "github.com/solrac97gr/go-shop/core/order/application"
 	orderPorts "github.com/solrac97gr/go-shop/core/order/domain/ports"
 	orderHdl "github.com/solrac97gr/go-shop/core/order/infrastructure/handlers"
@@ -26,6 +27,8 @@ import (
 	"github.com/solrac97gr/go-shop/shared/session"
 	"github.com/solrac97gr/go-shop/shared/shared_tools"
 	"github.com/solrac97gr/go-shop/shared/validator"
+
+	_ "github.com/lib/pq"
 )
 
 type Factory interface {
@@ -46,16 +49,26 @@ func NewCustomFactory() *CustomFactory {
 	return &CustomFactory{}
 }
 func (f *CustomFactory) BuildSharedTools() *shared.Tools {
+	env := config.NewCustomConfigurator()
+	dbConfig := env.GetDatabaseConfig()
+	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s "+
+		"password=%s dbname=%s sslmode=disable",
+		dbConfig.Host, dbConfig.Port, dbConfig.Username, dbConfig.Password, dbConfig.Name)
+	db, err := sql.Open("postgres", psqlInfo)
+	if err != nil {
+		panic(err)
+	}
 	return &shared.Tools{
 		Logger:               logger.NewCustomLogger(),
 		Validator:            validator.NewCustomValidator(),
-		EnvironmentVariables: config.NewCustomConfigurator(),
+		EnvironmentVariables: env,
 		SessionManager:       session.NewManager(),
-		DatabaseClient:       &sql.DB{},
+		DatabaseClient:       db,
 	}
 }
 
 func (f *CustomFactory) BuildMiddlewares(tools *shared.Tools) middleware.Middleware {
+
 	authenticator := auth.NewCustomAuth()
 	return middleware.NewFiberMiddleware(authenticator)
 }

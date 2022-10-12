@@ -1,5 +1,10 @@
 package config
 
+import (
+	"github.com/caarlos0/env"
+	"github.com/joho/godotenv"
+)
+
 type Configurator interface {
 	SetEnvironmentVariables() error
 	GetDatabaseConfig() DatabaseConfig
@@ -7,28 +12,35 @@ type Configurator interface {
 }
 
 type DatabaseConfig struct {
-	Host     string
-	Port     string
-	Username string
-	Password string
-	Name     string
+	Host     string `env:"DB_HOST" envDefault:"localhost"`
+	Port     string `env:"DB_PORT" envDefault:"54321"`
+	Username string `env:"DB_USERNAME" envDefault:"postgres"`
+	Password string `env:"DB_PASSWORD" envDefault:"postgres"`
+	Name     string `env:"DB_NAME" envDefault:"postgres"`
 }
 
 type CustomConfigurator struct {
 	Database    DatabaseConfig
-	Environment string
-	Port        string
+	Environment string `env:"ENVIRONMENT" envDefault:"development"`
+	Port        string `env:"PORT" envDefault:"3000"`
 }
 
 func NewCustomConfigurator() *CustomConfigurator {
-	return &CustomConfigurator{}
+	err := godotenv.Load()
+	if err != nil {
+		return &CustomConfigurator{}
+	}
+	config := CustomConfigurator{}
+	if err := env.Parse(&config); err != nil {
+		return &CustomConfigurator{}
+	}
+	return &config
 }
 
 var _ Configurator = (*CustomConfigurator)(nil)
 
 func (c *CustomConfigurator) GetDatabaseConfig() DatabaseConfig {
-	//TODO implement me
-	panic("implement me")
+	return c.Database
 }
 
 func (c *CustomConfigurator) SetEnvironmentVariables() error {
