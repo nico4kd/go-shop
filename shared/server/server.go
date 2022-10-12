@@ -2,6 +2,8 @@ package server
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/fiber/v2/middleware/monitor"
 	orderHdl "github.com/solrac97gr/go-shop/core/order/domain/ports"
 	paymentHdl "github.com/solrac97gr/go-shop/core/payment/domain/ports"
 	productHdl "github.com/solrac97gr/go-shop/core/product/domain/ports"
@@ -44,6 +46,9 @@ func NewFiberServer(
 
 func (s *FiberServer) Start(port string) {
 	app := fiber.New()
+	app.Use(logger.New(logger.Config{
+		Format: "[${ip}]:${port} ${status} - ${method} ${path}\n",
+	}))
 
 	v1 := app.Group("/v1")
 
@@ -74,6 +79,8 @@ func (s *FiberServer) Start(port string) {
 	orderRoutes.Post("/", s.OrderHandlers.Create)
 	orderRoutes.Put("/:id", s.OrderHandlers.Update)
 	orderRoutes.Delete("/:id", s.OrderHandlers.Delete)
+
+	app.Get("/metrics", monitor.New(monitor.Config{Title: "Go-Shop Metrics Page"}))
 
 	if port == "" {
 		port = "3000"
